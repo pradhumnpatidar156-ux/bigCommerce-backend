@@ -35,6 +35,7 @@ function pickImage(product) {
 function mapProduct(p) {
   return {
     id: p.id,
+    sku: p.sku || null,
     name: p.name,
     price: p.price !== undefined ? Number(p.price) : null,
     sale_price: p.sale_price !== undefined ? Number(p.sale_price) : null,
