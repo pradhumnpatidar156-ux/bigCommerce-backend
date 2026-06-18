@@ -12,6 +12,7 @@ function mapProduct(p) {
     id: p.id,
     name: p.name,
     price: p.price !== undefined ? Number(p.price) : null,
+    sale_price: p.sale_price !== undefined ? Number(p.sale_price) : null,
     inventory_level: p.inventory_level !== undefined ? p.inventory_level : null,
     url: p.custom_url && p.custom_url.url ? p.custom_url.url : p.url || null,
     image: pickImage(p)
@@ -29,7 +30,7 @@ exports.getProductsByCategory = async (req, res) => {
     const products = data.data || [];
 
     const filtered = products.filter(p => p.is_visible === true && (p.inventory_level > 0));
-    const mapped = filtered.map(mapProduct);
+    const mapped = filtered.map(mapProduct).slice(0, 6);
 
     return res.json(mapped);
   } catch (error) {
