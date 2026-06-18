@@ -1,10 +1,35 @@
 const bigCommerceService = require('../services/bigCommerceService');
 
 function pickImage(product) {
-  if (product.images && Array.isArray(product.images) && product.images.length > 0) {
-    return product.images[0].url_zoom || product.images[0].url_standard || product.images[0].url_thumbnail || product.images[0].image_url || null;
+  if (!product.images || !Array.isArray(product.images) || product.images.length === 0) {
+    return null;
   }
-  return null;
+
+  // Strategy 1: Find image marked as thumbnail (primary display image)
+  let selectedImage = product.images.find(img => img.is_thumbnail === true);
+  
+  // Strategy 2: Find image with sort_order = 0 (first in display order)
+  if (!selectedImage) {
+    selectedImage = product.images.find(img => img.sort_order === 0);
+  }
+  
+  // Strategy 3: Use first image as fallback
+  if (!selectedImage) {
+    selectedImage = product.images[0];
+  }
+
+  // Debug logging: log which strategy was used and the image details
+  if (process.env.DEBUG_IMAGES === 'true') {
+    console.log(`[Product ${product.id}] Selected image:`, {
+      is_thumbnail: selectedImage.is_thumbnail,
+      sort_order: selectedImage.sort_order,
+      url_standard: selectedImage.url_standard ? 'available' : 'N/A',
+      url_zoom: selectedImage.url_zoom ? 'available' : 'N/A'
+    });
+  }
+
+  // Return the best quality URL for storefront display
+  return selectedImage.url_standard || selectedImage.url_zoom || selectedImage.url_thumbnail || selectedImage.image_url || null;
 }
 
 function mapProduct(p) {
